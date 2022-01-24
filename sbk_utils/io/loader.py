@@ -18,7 +18,7 @@ class FileLoader(abc.ABC):
     @abc.abstractmethod
     def load(self) -> Any:
         pass
-    
+
 
 @dataclass
 class FileLoaderFactory():
@@ -32,6 +32,7 @@ class FileLoaderFactory():
     def build(self):
         ensure_path_exists(self.file_path)
         loader_type = self.file_path.suffix
+        print(loader_type)
 
         switch_loader_type = {
             ".json": JsonLoader(self.file_path).load(),
@@ -67,8 +68,9 @@ class YamlLoader(FileLoaderFactory):
                 data = yaml.safe_load(file)
             return data
         except (ScannerError, ParserError):
-            msg = f'\n*Cause: YAML file has a syntax error in ({self.file_path})'\
-                '\n*Action: Validate that the yaml file is correct'
+            msg = '\n*Cause: YAML file has a syntax error'\
+                  f'in ({self.file_path})'\
+                  '\n*Action: Validate that the yaml file is correct'
             raise InvalidSyntaxFile(msg)
 
 

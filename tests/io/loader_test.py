@@ -8,46 +8,74 @@ from sbk_utils.io.loader import (
 )
 
 
-@pytest.fixture(scope="session")
-def file_path():
-    return Path('tests/test_data/parsers.json')
+invalid_file = Path('tests/test_data/book_to_scrape.html')
+
+validatios_to_try = [
+    (r".*The json file has invalid content*", JsonLoader(invalid_file)),
+    (r".*YAML file has a syntax error*", YamlLoader(invalid_file)),
+]
+
+validatios_ids = [
+    "The Json file has invalid content",
+    "The Yaml file has invalid content",
+]
 
 
-@pytest.fixture(scope="session")
-def invalid_file():
-    return Path('tests/test_data/book_to_scrape.html')
+@pytest.mark.parametrize(
+    'match_msg, loader',
+    validatios_to_try,
+    ids=validatios_ids
+)
+def test_invalid_content(match_msg, loader):
+    with pytest.raises(
+        InvalidSyntaxFile,
+        match=match_msg
+    ):
+        _ = loader.load()
 
 
-def test_build(file_path):
+file_path_json = Path('tests/test_data/parsers.json')
+file_path_yaml = Path('tests/test_data/logging_config.yaml')
+
+tasks_to_try = [
+    (JsonLoader(file_path_json)),
+    (YamlLoader(file_path_yaml)),
+]
+
+tasks_ids = [
+    "Test a Json File",
+    "Test a Yaml File",
+]
+
+
+@pytest.mark.parametrize(
+    'data_file',
+    tasks_to_try,
+    ids=tasks_ids
+)
+def test_load_file(data_file):
+    file_loaded = data_file.load()
+    assert isinstance(file_loaded, dict)
+
+
+tasks = [
+    (Path('tests/test_data/logging_config.yaml'), YamlLoader),
+    (Path('tests/test_data/parsers.json'), JsonLoader),
+]
+
+ids = [
+    "Test build a JsonLoader instance from a json file ",
+    "Test build a YamlLoader instance from a yaml file ",
+]
+
+
+@pytest.mark.parametrize(
+    'file_path, loader',
+    tasks,
+    ids=ids
+)
+def test_build(file_path, loader):
     data_file = FileLoaderFactory(file_path)
     result = data_file.build()
     assert isinstance(result, dict)
-    #  assert 'hola' == result
-
-
-def test_load_json(file_path):
-    file = JsonLoader(file_path)
-    file_loaded = file.load()
-    assert isinstance(file_loaded, dict)
-
-
-def test_load_yaml(file_path):
-    file = JsonLoader(file_path)
-    file_loaded = file.load()
-    assert isinstance(file_loaded, dict)
-
-
-def test_invalid_content_jsonfile(invalid_file):
-    with pytest.raises(
-        InvalidSyntaxFile,
-        match='The json file has invalid content'
-    ):
-        _ = JsonLoader(invalid_file).load()
-
-
-def test_invalid_yaml_file(invalid_file):
-    with pytest.raises(
-        InvalidSyntaxFile,
-        match='YAML file has a syntax error'
-    ):
-        _ = YamlLoader(invalid_file).load()
+    #  assert isinstance(result, loader)
