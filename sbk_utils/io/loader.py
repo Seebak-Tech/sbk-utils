@@ -24,22 +24,21 @@ class FileLoader(abc.ABC):
 class FileLoaderFactory():
     file_path: Path
 
-    def invalid_suffix(self):
+    def __invalid_suffix(self):
         msg = '\n*Cause: The file suffix is not valid'\
               '\n*Action: Validate that the suffix of the file is correct'
         raise InvalidFile(msg)
 
     def build(self):
         ensure_path_exists(self.file_path)
-        loader_type = self.file_path.suffix
-        print(loader_type)
-
-        switch_loader_type = {
-            ".json": JsonLoader(self.file_path).load(),
-
-            ".yaml": YamlLoader(self.file_path).load()
-        }
-        return switch_loader_type.get(loader_type, self.invalid_suffix)
+        if self.file_path.suffix == '.json':
+            print('Builded a json loader')
+            return JsonLoader(self.file_path).load()
+        elif self.file_path.suffix == '.yaml':
+            print('Builded a yaml loader')
+            return YamlLoader(self.file_path).load()
+        else:
+            return self.__invalid_suffix()
 
 
 class JsonLoader(FileLoaderFactory):

@@ -3,6 +3,7 @@ from pathlib import Path
 from sbk_utils.io.loader import (
     JsonLoader,
     YamlLoader,
+    InvalidFile,
     InvalidSyntaxFile,
     FileLoaderFactory
 )
@@ -79,3 +80,22 @@ def test_build(file_path, loader):
     result = data_file.build()
     assert isinstance(result, dict)
     #  assert isinstance(result, loader)
+
+
+def test_build_yaml():
+    file_path = Path('tests/test_data/logging_config.yaml')
+    data_file = FileLoaderFactory(file_path)
+    result = data_file.build()
+    #  print(type(result))
+    #  assert isinstance(result, YamlLoader)
+    assert isinstance(result, dict)
+
+
+def test_invalid_suffix():
+    file_path = Path('tests/test_data/book_to_scrape.html')
+    with pytest.raises(
+        InvalidFile,
+        match = 'The file suffix is not valid'
+    ):
+        _ = FileLoaderFactory(file_path).build()
+
