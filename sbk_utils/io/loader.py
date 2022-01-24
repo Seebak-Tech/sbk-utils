@@ -9,36 +9,36 @@ class InvalidSyntaxFile(Exception):
         Exception.__init__(self, msg)
 
 
+class InvalidFile(Exception):
+    def __init__(self, msg):
+        Exception.__init__(self, msg)
+
+
 class FileLoader(abc.ABC):
     @abc.abstractmethod
     def load(self) -> Any:
         pass
-
+    
 
 @dataclass
 class FileLoaderFactory():
     file_path: Path
 
-    def error(self):
-        print("ERROR")
-
-    def __load_json(self):
-        file = JsonLoader(self.file_path)
-        return file.load()
-
-    def __load_yaml(self):
-        file = YamlLoader(self.file_path)
-        return file.load()
+    def invalid_suffix(self):
+        msg = '\n*Cause: The file suffix is not valid'\
+              '\n*Action: Validate that the suffix of the file is correct'
+        raise InvalidFile(msg)
 
     def build(self):
         ensure_path_exists(self.file_path)
         loader_type = self.file_path.suffix
 
         switch_loader_type = {
-            ".json": self.__load_json,
-            ".yaml": self.__load_yaml
+            ".json": JsonLoader(self.file_path).load(),
+
+            ".yaml": YamlLoader(self.file_path).load()
         }
-        return switch_loader_type.get(loader_type, self.error)()
+        return switch_loader_type.get(loader_type, self.invalid_suffix)
 
 
 class JsonLoader(FileLoaderFactory):
