@@ -16,7 +16,6 @@ class InvalidFile(Exception):
 
 @dataclass
 class FileHandler(abc.ABC):
-    #  file_path: Path
 
     @abc.abstractmethod
     def load(self) -> Any:
@@ -27,60 +26,76 @@ class FileHandler(abc.ABC):
 class FileHandlerFactory():
 
     @classmethod
-    def invalid_suffix(cls):
-        msg = '\n*Cause: The file suffix is not valid'\
-              '\n*Action: The suffixes permited are [json, yaml]'
-        raise InvalidFile(msg)
-
-    @classmethod
     def build_from_file(cls, file_path) -> FileHandler:
         ensure_path_exists(file_path)
         loader_type = file_path.suffix
-        print(loader_type)
         switcher = {
             ".json": JsonHandler,
             ".yaml": YamlHandler
         }
-        return switcher.get(
+        file_handler = switcher.get(
             loader_type,
-            cls.invalid_suffix()
-        )(file_path).load()
+            NullHandler
+        ).build(file_path)
+        return file_handler
 
 
-@dataclass(init=False)
+@dataclass()
+class NullHandler(FileHandler):
+    data: dict
+
+    @classmethod
+    def build(cls, file_path) -> FileHandler:
+        msg = '\n*Cause: The file suffix is not valid'\
+              '\n*Action: The suffixes permited are [json, yaml]'
+        raise InvalidFile(msg)
+
+    def load(self) -> dict:
+        return self.data
+
+
+@dataclass()
 class JsonHandler(FileHandler):
     data: dict
 
-    def load(self, file_path) -> dict:
+    @classmethod
+    def build(cls, file_path) -> FileHandler:
         import json
         from json.decoder import JSONDecodeError
         try:
             with file_path.open() as file:
                 data = json.load(file)
-            return data
+            return cls(data)
         except JSONDecodeError:
             msg = '\n*Cause: The json file has invalid content'\
                 '\n*Action: Validate that the json file is correct'
             raise InvalidSyntaxFile(msg)
 
+    def load(self) -> dict:
+        return self.data
 
-@dataclass(init=False)
+
+@dataclass()
 class YamlHandler(FileHandler):
     data: dict
 
-    def load(self, file_path) -> dict:
+    @classmethod
+    def build(cls, file_path) -> FileHandler:
         import yaml
         from yaml.scanner import ScannerError
         from yaml.parser import ParserError
         try:
             with file_path.open() as file:
                 data = yaml.safe_load(file)
-            return data
+            return cls(data)
         except (ScannerError, ParserError):
             msg = '\n*Cause: The yaml file has a syntax error'\
                   f'in ({file_path})'\
                   '\n*Action: Validate that the yaml file is correct'
             raise InvalidSyntaxFile(msg)
+
+    def load(self) -> dict:
+        return self.data
 
 
 def ensure_path_exists(path: Path):
