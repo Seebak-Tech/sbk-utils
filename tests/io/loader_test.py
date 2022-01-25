@@ -1,19 +1,19 @@
 import pytest
 from pathlib import Path
 from sbk_utils.io.loader import (
-    JsonLoader,
-    YamlLoader,
+    JsonHandler,
+    YamlHandler,
     InvalidFile,
     InvalidSyntaxFile,
-    FileLoaderFactory
+    FileHandlerFactory
 )
 
 
 invalid_file = Path('tests/test_data/book_to_scrape.html')
 
 validatios_to_try = [
-    (r".*The json file has invalid content*", JsonLoader(invalid_file)),
-    (r".*YAML file has a syntax error*", YamlLoader(invalid_file)),
+    (r".*The json file has invalid content*", JsonHandler(), invalid_file),
+    (r".*The yaml file has a syntax error*", YamlHandler(), invalid_file),
 ]
 
 validatios_ids = [
@@ -23,79 +23,46 @@ validatios_ids = [
 
 
 @pytest.mark.parametrize(
-    'match_msg, loader',
+    'match_msg, loader, invalid_file',
     validatios_to_try,
     ids=validatios_ids
 )
-def test_invalid_content(match_msg, loader):
+def test_invalid_content(match_msg, loader, invalid_file):
     with pytest.raises(
         InvalidSyntaxFile,
         match=match_msg
     ):
-        _ = loader.load()
+        _ = loader.load(invalid_file)
 
 
 file_path_json = Path('tests/test_data/parsers.json')
 file_path_yaml = Path('tests/test_data/logging_config.yaml')
 
-tasks_to_try = [
-    (JsonLoader(file_path_json)),
-    (YamlLoader(file_path_yaml)),
+loads_to_try = [
+    (JsonHandler(), file_path_json),
+    (YamlHandler(), file_path_yaml),
 ]
 
 tasks_ids = [
-    "Test a Json File",
-    "Test a Yaml File",
+    "Test a Json File loaded is a dictionary",
+    "Test a Yaml File loaded is a dictionary",
 ]
 
 
 @pytest.mark.parametrize(
-    'data_file',
-    tasks_to_try,
+    'data_file, path_file',
+    loads_to_try,
     ids=tasks_ids
 )
-def test_load_file(data_file):
-    file_loaded = data_file.load()
+def test_load_file(data_file, path_file):
+    file_loaded = data_file.load(path_file)
     assert isinstance(file_loaded, dict)
-
-
-tasks = [
-    (Path('tests/test_data/logging_config.yaml'), YamlLoader),
-    (Path('tests/test_data/parsers.json'), JsonLoader),
-]
-
-ids = [
-    "Test build a JsonLoader instance from a json file ",
-    "Test build a YamlLoader instance from a yaml file ",
-]
-
-
-@pytest.mark.parametrize(
-    'file_path, loader',
-    tasks,
-    ids=ids
-)
-def test_build(file_path, loader):
-    data_file = FileLoaderFactory(file_path)
-    result = data_file.build()
-    assert isinstance(result, dict)
-    #  assert isinstance(result, loader)
-
-
-def test_build_yaml():
-    file_path = Path('tests/test_data/logging_config.yaml')
-    data_file = FileLoaderFactory(file_path)
-    result = data_file.build()
-    #  print(type(result))
-    #  assert isinstance(result, YamlLoader)
-    assert isinstance(result, dict)
 
 
 def test_invalid_suffix():
     file_path = Path('tests/test_data/book_to_scrape.html')
     with pytest.raises(
         InvalidFile,
-        match = 'The file suffix is not valid'
+        match='The file suffix is not valid'
     ):
-        _ = FileLoaderFactory(file_path).build()
-
+        _ = FileHandlerFactory.build_from_file(file_path)
