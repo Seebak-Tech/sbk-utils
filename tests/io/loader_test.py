@@ -34,12 +34,9 @@ def test_invalid_content(match_msg, handler, invalid_file):
         _ = handler.build(invalid_file)
 
 
-file_path_json = Path('tests/test_data/parsers.json')
-file_path_yaml = Path('tests/test_data/logging_config.yaml')
-
-loads_to_try = [
-    (JsonHandler, file_path_json),
-    (YamlHandler, file_path_yaml),
+handler_to_try = [
+    (JsonHandler, Path('tests/test_data/parsers.json')),
+    (YamlHandler, Path('tests/test_data/logging_config.yaml')),
 ]
 
 tasks_ids = [
@@ -49,13 +46,13 @@ tasks_ids = [
 
 
 @pytest.mark.parametrize(
-    'loader, file_path',
-    loads_to_try,
+    'handler, file_path',
+    handler_to_try,
     ids=tasks_ids
 )
-def test_load_file(loader, file_path):
-    file = FileHandlerFactory.build_from_file(file_path)
-    assert isinstance(file, loader)
+def test_load_file(handler, file_path):
+    file_handler = FileHandlerFactory.build_from_file(file_path)
+    assert isinstance(file_handler, handler)
 
 
 def test_invalid_suffix():
@@ -65,10 +62,3 @@ def test_invalid_suffix():
         match='The file suffix is not valid'
     ):
         _ = FileHandlerFactory.build_from_file(file_path)
-
-
-#  def test_load_file():
-    #  file_path = Path('tests/test_data/logging_config.yaml')
-    #  file = FileHandlerFactory.build_from_file(file_path)
-    #  print(file)
-    #  assert file == '{}'

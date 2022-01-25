@@ -21,6 +21,10 @@ class FileHandler(abc.ABC):
     def load(self) -> Any:
         pass
 
+    @abc.abstractmethod
+    def build(self) -> Any:
+        pass
+
 
 @dataclass(init=False)
 class FileHandlerFactory():
