@@ -2,6 +2,7 @@ from typing import Any
 from dataclasses import dataclass
 from pathlib import Path
 import abc
+import sbk_utils.constants as cnst
 
 
 class InvalidSyntaxFile(Exception):
@@ -34,8 +35,8 @@ class FileHandlerFactory():
         ensure_path_exists(file_path)
         loader_type = file_path.suffix
         switcher = {
-            ".json": JsonHandler,
-            ".yaml": YamlHandler
+            cnst.SUFFIX_JSON: JsonHandler,
+            cnst.SUFFIX_YAML: YamlHandler
         }
         file_handler = switcher.get(
             loader_type,
