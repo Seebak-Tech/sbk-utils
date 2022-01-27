@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "sbk-utils"
-version = "0.1.0"
+version = "0.1.1"
 description = ""
 authors = ["Monica Nataly <nata.moonk@gmail.com>"]
 
