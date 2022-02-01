@@ -18,7 +18,7 @@ def find_dict_keys(srch_dict: dict, fields: list) -> list:
     return fields_found
 
 
-def validate_keys(srch_dict: dict, valid_keys: list) -> None:
+def validate_dict_keys(srch_dict: dict, valid_keys: list) -> None:
     found_keys = set(
         find_dict_keys(srch_dict, valid_keys)
     )

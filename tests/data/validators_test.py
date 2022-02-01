@@ -1,5 +1,5 @@
 import pytest
-from sbk_utils.data.validators import find_dict_keys, validate_keys
+from sbk_utils.data.validators import find_dict_keys, validate_dict_keys
 
 
 def test_find_dict_keys(search_dict):
@@ -17,4 +17,4 @@ def test_validate_bad_keys(search_dict):
 
     with pytest.raises(ValueError,
                        match=r".*The dictionary must contain the following*"):
-        validate_keys(search_dict, fields)
+        validate_dict_keys(search_dict, fields)
