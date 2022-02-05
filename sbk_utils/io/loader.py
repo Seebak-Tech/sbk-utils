@@ -3,6 +3,10 @@ from dataclasses import dataclass
 from pathlib import Path
 import abc
 import sbk_utils.constants as cnst
+from sbk_utils.logger import Logger
+
+
+logger = Logger(__name__).get_logger()
 
 
 class InvalidSyntaxFile(Exception):
