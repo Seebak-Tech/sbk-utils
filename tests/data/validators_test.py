@@ -1,5 +1,9 @@
 import pytest
-from sbk_utils.data.validators import find_dict_keys, validate_dict_keys
+from sbk_utils.data.validators import (
+    find_dict_keys,
+    validate_dict_keys,
+    instance_of
+)
 
 
 def test_find_dict_keys(search_dict):
@@ -14,7 +18,27 @@ def test_find_dict_keys(search_dict):
 
 def test_validate_bad_keys(search_dict):
     fields = ['key1', 'inner_lst_key1', 'inner_dict_key1', 'key10']
+    match_str = r".*The dictionary must contain all the following*"
 
     with pytest.raises(ValueError,
-                       match=r".*The dictionary must contain the following*"):
+                       match=match_str):
         validate_dict_keys(search_dict, fields)
+
+
+@pytest.mark.parametrize(
+    'value, attr_type',
+    [
+        ('test', dict),
+        (34, str),
+        (3.45, list)
+    ],
+    ids=[
+        "Invalid dict type",
+        "Invalid string type",
+        "Invalid list type"
+    ]
+)
+def test_is_instance_of(value, attr_type):
+    with pytest.raises(TypeError,
+                       match=r".*The object must be type of*"):
+        instance_of(value, attr_type)

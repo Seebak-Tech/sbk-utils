@@ -24,14 +24,26 @@ def validate_dict_keys(srch_dict: dict, valid_keys: list) -> None:
     )
     invalid_keys = set(valid_keys).difference(found_keys)
     if len(found_keys) != len(valid_keys):
-        msg = "\n*Cause: The following 'keys' were not found: [{}]".format(
+        msg = "\n*Cause: The following keys were not found: [{}]".format(
             ", ".join(
-                sorted(invalid_keys)
+                "'" + key + "'" for key in sorted(invalid_keys)
             )
-        ) + "\n*Action: The dictionary must contain the following 'keys':" \
+        ) + "\n*Action: The dictionary must contain all the following keys:" \
             " [{}]".format(
                 ", ".join(
-                    sorted(set(valid_keys))
+                    "'" + key + "'" for key in sorted(set(valid_keys))
                 )
             )
         raise ValueError(msg)
+
+
+def instance_of(value, attr_type) -> None:
+    if not isinstance(value, attr_type):
+        actual = value.__class__
+        msg = (
+            f"\n*Cause: The object must be type of '{attr_type}' "
+            f"and got an object of type '{actual}'"
+            "\n*Action: Set the the appropiate data type "
+            f"for the passed value({value})"
+        )
+        raise TypeError(msg)
