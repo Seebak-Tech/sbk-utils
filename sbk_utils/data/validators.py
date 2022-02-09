@@ -26,12 +26,12 @@ def validate_dict_keys(srch_dict: dict, valid_keys: list) -> None:
     if len(found_keys) != len(valid_keys):
         msg = "\n*Cause: The following keys were not found: [{}]".format(
             ", ".join(
-                "'" + key + "'" for key in sorted(invalid_keys)
+                f"'{key}'" for key in sorted(invalid_keys)
             )
         ) + "\n*Action: The dictionary must contain all the following keys:" \
             " [{}]".format(
                 ", ".join(
-                    "'" + key + "'" for key in sorted(set(valid_keys))
+                    f"'{key}'" for key in sorted(set(valid_keys))
                 )
             )
         raise ValueError(msg)
