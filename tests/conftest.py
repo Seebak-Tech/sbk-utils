@@ -1,5 +1,7 @@
 import pytest
-
+import sbk_utils.constants as cnst
+from sbk_utils.io.loader import FileHandlerFactory
+from pathlib import Path
 
 @pytest.fixture(scope="session")
 def search_dict():
@@ -16,3 +18,33 @@ def search_dict():
         },
         'key4': True
     }
+
+
+@pytest.fixture()
+def default_config():
+    config_file = cnst.LOGGER_CONFIG_FILE
+    file_handler = FileHandlerFactory.build_from_file(Path(config_file))
+    return file_handler.load()
+
+@pytest.fixture()
+def invalid_key_dict(default_config):
+    config = default_config.copy()
+    config["handlers"]["file"]["backupCount"] = 20
+    print(config["handlers"]["file"]["backupCount"])
+    return config
+
+
+@pytest.fixture()
+def invalid_path_dict(default_config):
+    config = default_config.copy()
+    config["handlers"]["file"]["filename"] = "/work"
+    print(config["handlers"]["file"]["filename"])
+    return config
+
+
+@pytest.fixture()
+def invalid_value_dict(default_config):
+    config = default_config.copy()
+    config["handlers"]["console"]["level"] = "hola"
+    print(config["handlers"]["console"]["level"])
+    return config

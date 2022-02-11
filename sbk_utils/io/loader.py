@@ -3,10 +3,11 @@ from dataclasses import dataclass
 from pathlib import Path
 import abc
 import sbk_utils.constants as cnst
-from sbk_utils.logger import Logger
+from sbk_utils.logger import LoggerFactory
 
+logger = LoggerFactory(logger_name=__name__).build()
 
-logger = Logger(__name__).get_logger()
+#  logger = Logger(__name__).get_logger()
 
 
 class InvalidSyntaxFile(Exception):
@@ -19,7 +20,6 @@ class InvalidFile(Exception):
         Exception.__init__(self, msg)
 
 
-@dataclass
 class FileHandler(abc.ABC):
 
     @abc.abstractmethod
@@ -110,5 +110,6 @@ class YamlHandler(FileHandler):
 def ensure_path_exists(path: Path):
     msg = f'\n*Cause: The Path does not exists'\
         f'\n*Action: Validate the following Path exists: ({path})'
+    logger.info('The path exists')
     if not path.exists():
         raise ValueError(msg)
