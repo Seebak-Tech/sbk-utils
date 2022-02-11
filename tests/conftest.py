@@ -26,6 +26,7 @@ def default_config():
     file_handler = FileHandlerFactory.build_from_file(Path(config_file))
     return file_handler.load()
 
+
 @pytest.fixture()
 def invalid_key_dict(default_config):
     config = default_config.copy()

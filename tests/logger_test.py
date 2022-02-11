@@ -1,10 +1,10 @@
-import pytest
-import sbk_utils.constants as cnst
 from sbk_utils.logger import LoggerFactory, InvalidDictStructure
 from sbk_utils.io.loader import FileHandlerFactory, ensure_path_exists
+import sbk_utils.constants as cnst
 from pathlib import Path
-import logging
 import logging.config
+import logging
+import pytest
 
 
 config_to_try = [
@@ -39,7 +39,7 @@ def test_logger_config_default():
     logger = LoggerFactory(
         logger_name="sbk_utils.logger"
     ).build()
-    assert logging.getLevelName(logger.level) == 'INFO'
+    assert logging.getLevelName(logger.level) == 'DEBUG'
 
 
 def test_logger_valid_config():
@@ -54,7 +54,20 @@ def test_logger_valid_config():
     assert logging.getLevelName(logger.level) == 'DEBUG'
 
 
-def test_logger_message(caplog):
-    path_invalid = Path("/home")
-    ensure_path_exists(path_invalid)
-    assert 'The path exists' in caplog.text
+def test_logger_config_level_default():
+    logger = LoggerFactory(
+        logger_name="sbk_utils.logger",
+        log_level="CRITICAL"
+    ).build()
+    assert logging.getLevelName(logger.level) == 'CRITICAL'
+
+
+def test_invalid_level_default():
+    with pytest.raises(
+        ValueError,
+        match="The logger level is invalid"
+    ):
+        _ = LoggerFactory(
+                logger_name="sbk_utils.logger",
+                log_level="INCORRECT_LEVEL"
+            ).build()

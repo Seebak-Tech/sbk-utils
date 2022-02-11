@@ -20,15 +20,32 @@ class Logger(abc.ABC):
 @define()
 class DefaultLogger(Logger):
     logger_name: str = field()
+    log_level: str = field(default="DEBUG")
 
     @logger_name.validator
     def validate_logger_name(self, attribute, value) -> None:
         instance_of(value, attribute.type)
 
-    def __set_handler(self):
-        console_handler = logging.StreamHandler()
-        console_handler.setLevel(logging.INFO)
+    def __get_logger_level(self):
+        switcher = {
+            "CRITICAL": logging.CRITICAL,
+            "ERROR": logging.ERROR,
+            "WARNING": logging.WARNING,
+            "INFO": logging.INFO,
+            "DEBUG": logging.DEBUG
+        }
+        level = switcher.get(self.log_level, 0)
+        if level == 0:
+            msg = "\n*Cause: The logger level is invalid, given"\
+                  f"({self.log_level})"\
+                  "\n*Action: Assign the correct logger level value:"\
+                  "['CRITICAL', 'ERROR', 'WARNING', 'INFO', 'DEBUG']"
+            raise ValueError(msg)
+        return level
 
+    def __build_console_handler(self):
+        console_handler = logging.StreamHandler()
+        console_handler.setLevel(self.__get_logger_level())
         formatter = logging.Formatter(
             '[%(asctime)s] %(name)s:%(lineno)d %(levelname)s - %(message)s'
         )
@@ -37,9 +54,9 @@ class DefaultLogger(Logger):
 
     def get_logger(self):
         logger = logging.getLogger(self.logger_name)
-        logger.setLevel(logging.INFO)
-        console_handler = self.__set_handler()
-        logger.addHandler(console_handler)
+        logger.setLevel(self.__get_logger_level())
+        handler = self.__build_console_handler()
+        logger.addHandler(handler)
         return logger
 
 
@@ -74,8 +91,12 @@ class LoggerFactory():
 
     def build(self):
         if self.kargs.get("config") is None:
-            return DefaultLogger(self.logger_name).get_logger()
+            return DefaultLogger(
+                self.logger_name,
+                **self.kargs
+            ).get_logger()
         else:
             return ConfigDictLogger(
-                self.logger_name, **self.kargs
+                self.logger_name,
+                **self.kargs
             ).get_logger()
