@@ -1,5 +1,5 @@
 from sbk_utils.logger import LoggerFactory, InvalidDictStructure
-from sbk_utils.io.loader import FileHandlerFactory, ensure_path_exists
+from sbk_utils.io.loader import FileHandlerFactory
 import sbk_utils.constants as cnst
 from pathlib import Path
 import logging.config
@@ -7,7 +7,7 @@ import logging
 import pytest
 
 
-config_to_try = [
+fixtures_to_try = [
     ("invalid_key_dict"),
     ("invalid_path_dict"),
     ("invalid_value_dict")
@@ -16,7 +16,7 @@ config_to_try = [
 
 @pytest.mark.parametrize(
     'dict_config',
-    config_to_try,
+    fixtures_to_try,
     ids=[
         "Test invalid keys in dictionary",
         "Test invalid log path or file",

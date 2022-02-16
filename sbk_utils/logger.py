@@ -3,6 +3,7 @@ import logging
 import abc
 from attrs import define, field
 from sbk_utils.data.validators import instance_of
+import sbk_utils.constants as cnst
 
 
 class InvalidDictStructure(Exception):
@@ -47,7 +48,7 @@ class DefaultLogger(Logger):
         console_handler = logging.StreamHandler()
         console_handler.setLevel(self.__get_logger_level())
         formatter = logging.Formatter(
-            '[%(asctime)s] %(name)s:%(lineno)d %(levelname)s - %(message)s'
+           cnst.LOGGER_DEFAULT_FORMATER
         )
         console_handler.setFormatter(formatter)
         return console_handler
@@ -89,7 +90,7 @@ class LoggerFactory():
         self.kargs = kargs
 
     def build(self):
-        if self.kargs.get("config") is None:
+        if self.kargs.get(cnst.CONFIG_ATTR_KEY) is None:
             return DefaultLogger(
                 self.logger_name,
                 **self.kargs
