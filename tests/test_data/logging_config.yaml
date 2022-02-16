@@ -14,7 +14,7 @@ handlers:
     class: logging.FileHandler
     level: INFO
     formatter: user
-    filename: logs/logs.log
+    filename: tests/test_data/logs/logs.log
     encoding: utf8
 loggers:
   sbk_utils.logger:  

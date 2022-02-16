@@ -4,5 +4,5 @@
 SUFFIX_YAML = ".yaml"
 SUFFIX_JSON = ".json"
 
-#Tests Files
+# Tests Files
 LOGGER_CONFIG_FILE = "tests/test_data/logging_config.yaml"

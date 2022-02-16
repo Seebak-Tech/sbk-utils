@@ -3,6 +3,7 @@ import sbk_utils.constants as cnst
 from sbk_utils.io.loader import FileHandlerFactory
 from pathlib import Path
 
+
 @pytest.fixture(scope="session")
 def search_dict():
     return {
@@ -31,7 +32,6 @@ def default_config():
 def invalid_key_dict(default_config):
     config = default_config.copy()
     config["handlers"]["file"]["backupCount"] = 20
-    print(config["handlers"]["file"]["backupCount"])
     return config
 
 
@@ -39,7 +39,6 @@ def invalid_key_dict(default_config):
 def invalid_path_dict(default_config):
     config = default_config.copy()
     config["handlers"]["file"]["filename"] = "/work"
-    print(config["handlers"]["file"]["filename"])
     return config
 
 
@@ -47,5 +46,4 @@ def invalid_path_dict(default_config):
 def invalid_value_dict(default_config):
     config = default_config.copy()
     config["handlers"]["console"]["level"] = "hola"
-    print(config["handlers"]["console"]["level"])
     return config

@@ -65,7 +65,6 @@ class ConfigDictLogger(Logger):
     logger_name: str = field()
     config: dict = field()
 
-
     @logger_name.validator
     def validate_logger_name(self, attribute, value) -> None:
         instance_of(value, attribute.type)
